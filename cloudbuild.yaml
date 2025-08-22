@@ -1,1 +1,23 @@
-[same content as before]
+steps:
+- name: 'node:18'
+  entrypoint: 'npm'
+  args: ['ci']
+  
+- name: 'node:18'
+  entrypoint: 'npx'
+  args: ['hardhat', 'compile']
+  
+- name: 'trailofbits/eth-security-toolbox'
+  entrypoint: 'slither'
+  args: ['contracts/obeliskpresale.sol', '--json', '/workspace/presale-security-report.json']
+  
+- name: 'node:18'
+  entrypoint: 'npx'
+  args: ['hardhat', 'test']
+
+artifacts:
+  objects:
+    location: 'gs://obsk-audit-reports-$BUILD_ID'
+    paths: ['*.json', 'artifacts/**/*']
+
+timeout: '1200s'
