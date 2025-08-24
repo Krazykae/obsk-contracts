@@ -17,5 +17,5 @@ options:
   logging: CLOUD_LOGGING_ONLY
 artifacts:
   objects:
-    location: gs://obsk-landing-page-469120_cloudbuild/audit-reports/$BUILD_ID
+    location: gs://obsk-audit-reports-$(date +%Y%m%d)/$BUILD_ID
     paths: ['obsk-security-report.json']
