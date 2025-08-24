@@ -7,17 +7,11 @@ steps:
   args: [hardhat, compile]
 - name: trailofbits/eth-security-toolbox
   entrypoint: slither
-  args: [contracts/ObeliskPresale.sol, --json, /workspace/presale-security-report.json]
-- name: trailofbits/eth-security-toolbox
-  entrypoint: slither
-  args: [contracts/ObeliskToken.sol, --json, /workspace/token-security-report.json]
-- name: trailofbits/eth-security-toolbox
-  entrypoint: slither
-  args: [contracts/FounderVesting.sol, --json, /workspace/vesting-security-report.json]
+  args: [., --json, /workspace/security-report.json]
 timeout: 1200s
 options:
   logging: CLOUD_LOGGING_ONLY
 artifacts:
   objects:
     location: gs://obsk-landing-page-469120_cloudbuild/audit-reports/$BUILD_ID
-    paths: ['*-security-report.json']
+    paths: ['security-report.json']
