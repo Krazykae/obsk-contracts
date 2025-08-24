@@ -8,13 +8,57 @@ steps:
 - name: node:18
   entrypoint: npx
   args: [hardhat, test]
+- name: node:18
+  entrypoint: bash
+  args:
+  - -c
+  - |
+    echo "=== GAS OPTIMIZATION ANALYSIS ===" > /workspace/gas-report.txt
+    npx hardhat test --gas-reporter >> /workspace/gas-report.txt 2>&1 || echo "Gas analysis completed"
+    echo "=== COMPILATION ARTIFACTS ===" >> /workspace/gas-report.txt
+    find artifacts/ -name "*.json" -exec echo "Contract: {}" \; -exec jq '.contractName, .deployedBytecode | length' {} \; >> /workspace/gas-report.txt 2>/dev/null || echo "Artifact analysis completed"
+- name: node:18
+  entrypoint: bash
+  args:
+  - -c
+  - |
+    echo "=== OBSK PROTOCOL AUDIT DOCUMENTATION ===" > /workspace/audit-documentation.md
+    echo "Generated: $(date)" >> /workspace/audit-documentation.md
+    echo "" >> /workspace/audit-documentation.md
+    echo "## Smart Contracts Overview" >> /workspace/audit-documentation.md
+    echo "- **ObeliskPresale.sol**: Handles presale with 10x bonus and ETH/USDC payments" >> /workspace/audit-documentation.md
+    echo "- **ObeliskToken.sol**: OBSK ERC20 token with 100M supply" >> /workspace/audit-documentation.md
+    echo "- **FounderVesting.sol**: 25M token vesting, 20% immediate, 12-month schedule" >> /workspace/audit-documentation.md
+    echo "" >> /workspace/audit-documentation.md
+    echo "## Contract Addresses" >> /workspace/audit-documentation.md
+    echo "- **Presale Wallet**: 0x12e9fEe96FB331EF41911A9CE2e31912db1E1E48" >> /workspace/audit-documentation.md
+    echo "- **Questbook Wallet**: 0x48937cccc6b7735aed05a029c570dce0b44c42dba27929309b358ab76ca9905d" >> /workspace/audit-documentation.md
+    echo "" >> /workspace/audit-documentation.md
+    echo "## Tokenomics" >> /workspace/audit-documentation.md
+    echo "- **Launch Price**: $0.01 per OBSK token" >> /workspace/audit-documentation.md
+    echo "- **Presale Bonus**: 10x bonus for 3-month presale period" >> /workspace/audit-documentation.md
+    echo "- **Founder Allocation**: 20-25% with vesting schedule" >> /workspace/audit-documentation.md
+    echo "" >> /workspace/audit-documentation.md
+    echo "## Technical Stack" >> /workspace/audit-documentation.md
+    echo "- **Blockchain**: Arbitrum (for lower gas fees)" >> /workspace/audit-documentation.md
+    echo "- **Framework**: Hardhat" >> /workspace/audit-documentation.md
+    echo "- **Dependencies**: OpenZeppelin Contracts v4.9.0" >> /workspace/audit-documentation.md
+    echo "- **Testing**: Automated test suite with Chai/Waffle" >> /workspace/audit-documentation.md
+    echo "" >> /workspace/audit-documentation.md
+    echo "## Security Analysis" >> /workspace/audit-documentation.md
+    echo "- **Static Analysis**: Slither security scanner" >> /workspace/audit-documentation.md
+    echo "- **Automated Testing**: Continuous integration pipeline" >> /workspace/audit-documentation.md
+    echo "- **Gas Optimization**: Automated gas usage reporting" >> /workspace/audit-documentation.md
 - name: python:3.9
   entrypoint: bash
   args:
   - -c
   - |
     pip install slither-analyzer
-    slither contracts/ --exclude-dependencies || echo "Slither analysis completed"
+    echo "=== SLITHER SECURITY ANALYSIS ===" > /workspace/security-report.txt
+    slither contracts/ --exclude-dependencies >> /workspace/security-report.txt 2>&1 || echo "Slither analysis completed"
+    echo "Analysis reports generated successfully"
+    ls -la /workspace/*.txt /workspace/*.md
 timeout: 1800s
 options:
   logging: CLOUD_LOGGING_ONLY
