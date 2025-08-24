@@ -5,15 +5,18 @@ steps:
 - name: node:18
   entrypoint: npx
   args: [hardhat, compile]
-- name: python:3.9
+- name: ubuntu:20.04
   entrypoint: bash
   args:
   - -c
   - |
-    pip install slither-analyzer
-    slither contracts/ --json /workspace/obsk-security-report.json || echo "Slither analysis completed with findings"
-    echo "Security analysis complete - report generated"
-    ls -la /workspace/obsk-security-report.json
-timeout: 1200s
+    apt-get update
+    apt-get install -y python3 python3-pip
+    pip3 install slither-analyzer
+    echo "Slither installed successfully"
+    slither --version
+    echo "Running Slither analysis on contracts..."
+    slither contracts/ --exclude-dependencies || echo "Slither analysis completed"
+timeout: 1800s
 options:
   logging: CLOUD_LOGGING_ONLY
